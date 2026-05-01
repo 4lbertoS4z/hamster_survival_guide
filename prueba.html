@@ -165,6 +165,7 @@
                 </div>
             </div>
 
+            <!-- ESTA ES LA COLUMNA CENTRAL: REEMPLÁZALA COMPLETA -->
             <div class="lg:col-span-4 bg-slate-900/50 p-4 rounded-lg border border-slate-700">
                 <h4 class="text-xs font-bold text-slate-400 uppercase mb-4 text-center">3. Ajustar Atributos (Máx +49
                     pts)</h4>
@@ -172,29 +173,37 @@
                     <div>
                         <div class="flex items-center gap-3">
                             <span class="text-xs font-bold w-12 text-red-400">HP:</span>
-                            <input type="number" id="inputHP" oninput="enforceLimits(this, 'hp')">
+                            <input type="range" id="inputHP" class="w-full accent-red-500 cursor-pointer"
+                                oninput="handleSlider(this, 'hp')">
+                            <span id="valHP" class="text-sm font-bold w-8 text-right text-white">0</span>
                         </div>
                     </div>
                     <div>
                         <div class="flex items-center gap-3">
                             <span class="text-xs font-bold w-12 text-amber-400">STR:</span>
-                            <input type="number" id="inputSTR" oninput="enforceLimits(this, 'str')">
+                            <input type="range" id="inputSTR" class="w-full accent-amber-500 cursor-pointer"
+                                oninput="handleSlider(this, 'str')">
+                            <span id="valSTR" class="text-sm font-bold w-8 text-right text-white">0</span>
                         </div>
                     </div>
                     <div>
                         <div class="flex items-center gap-3">
                             <span class="text-xs font-bold w-12 text-emerald-400">LUCK:</span>
-                            <input type="number" id="inputLUCK" oninput="enforceLimits(this, 'luck')">
+                            <input type="range" id="inputLUCK" class="w-full accent-emerald-500 cursor-pointer"
+                                oninput="handleSlider(this, 'luck')">
+                            <span id="valLUCK" class="text-sm font-bold w-8 text-right text-white">0</span>
                         </div>
                     </div>
-                    <div class="limit-info">
-                        <div class="flex justify-between text-[10px] uppercase font-bold">
-                            <span>Puntos Extra:</span>
-                            <span id="extraPointsLabel">0 / 49</span>
-                        </div>
-                        <div class="w-full bg-slate-700 h-1.5 rounded-full mt-1">
-                            <div id="pointsBar" class="bg-sky-400 h-full rounded-full transition-all" style="width: 0%">
-                            </div>
+                </div>
+
+                <!-- Info de puntos extra (Necesario para que calculate() funcione) -->
+                <div class="limit-info mt-4">
+                    <div class="flex justify-between text-[10px] mb-1">
+                        <span class="text-slate-400 uppercase font-bold">Puntos Extra</span>
+                        <span id="extraPointsLabel" class="text-sky-400 font-bold">0 / 49</span>
+                    </div>
+                    <div class="w-full bg-slate-800 rounded-full h-1.5">
+                        <div id="pointsBar" class="bg-sky-400 h-full rounded-full transition-all" style="width: 0%">
                         </div>
                     </div>
                 </div>
@@ -231,32 +240,7 @@
             // Esta habilidad no bloquea inputs, solo afecta al resultado final
             calculate();
         }
-        function toggleUltimate() {
-            const isChecked = document.getElementById('ultimateToggle').checked;
-            const hpInput = document.getElementById('inputHP');
-            const strInput = document.getElementById('inputSTR');
-            const luckInput = document.getElementById('inputLUCK');
 
-            if (isChecked) {
-                // Guardamos lo que el usuario tenía escrito
-                userStatsCache.hp = hpInput.value;
-                userStatsCache.str = strInput.value;
-                userStatsCache.luck = luckInput.value;
-
-                // Ponemos todo al máximo y bloqueamos
-                hpInput.value = 100;
-                strInput.value = 100;
-                luckInput.value = 100;
-                hpInput.disabled = strInput.disabled = luckInput.disabled = true;
-            } else {
-                // Restauramos y desbloqueamos
-                hpInput.value = userStatsCache.hp;
-                strInput.value = userStatsCache.str;
-                luckInput.value = userStatsCache.luck;
-                hpInput.disabled = strInput.disabled = luckInput.disabled = false;
-            }
-            calculate();
-        }
         const survivalTable = [
             { sum: 50, prob: 20.38 }, { sum: 100, prob: 24.71 }, { sum: 150, prob: 33.83 },
             { sum: 185, prob: 43.07 }, { sum: 200, prob: 47.75 }, { sum: 215, prob: 52.86 },
@@ -304,78 +288,143 @@
             return 0;
         }
 
+        // 1. GESTIÓN DE SLIDERS: Controla que no pasen de +49 puntos
+        function handleSlider(activeSlider, type) {
+            const h = hamsters[document.getElementById('hamsterSelect').value];
+            const hpS = document.getElementById('inputHP');
+            const strS = document.getElementById('inputSTR');
+            const luckS = document.getElementById('inputLUCK');
+
+            let totalExtra = (parseInt(hpS.value) - h.hp) +
+                (parseInt(strS.value) - h.str) +
+                (parseInt(luckS.value) - h.luck);
+
+            if (totalExtra > 49) {
+                const exceso = totalExtra - 49;
+                activeSlider.value = parseInt(activeSlider.value) - exceso;
+            }
+
+            document.getElementById('valHP').innerText = hpS.value;
+            document.getElementById('valSTR').innerText = strS.value;
+            document.getElementById('valLUCK').innerText = luckS.value;
+
+            calculate();
+        }
+
+        // 2. CARGA DE DATOS: Configura los sliders cuando cambias de hámster
         function loadHamsterStats() {
-            // 1. Obtener los datos del hámster seleccionado
             const h = hamsters[document.getElementById('hamsterSelect').value];
+            const hpS = document.getElementById('inputHP');
+            const strS = document.getElementById('inputSTR');
+            const luckS = document.getElementById('inputLUCK');
 
-            // 2. Referencias a los elementos del Ultimate (el switch que añadiste)
-            const ultContainer = document.getElementById('ultimateContainer');
-            const ultContainerAutoWin = document.getElementById('ultimateContainerAutoWin');
-            const ultToggle = document.getElementById('ultimateToggle');
-            const autoWinToggle = document.getElementById('ultimateAutoWinToggle');
-            // 3. Resetear el estado del Ultimate al cambiar de hámster
-            // Esto evita que si activas el Ultimate en uno, se quede activado en el siguiente
-            ultToggle.checked = false;
-            autoWinToggle.checked = false;
-            document.getElementById('inputHP').disabled = false;
-            document.getElementById('inputSTR').disabled = false;
-            document.getElementById('inputLUCK').disabled = false;
+            // Reset de habilidades ultimate
+            document.getElementById('ultimateToggle').checked = false;
+            document.getElementById('ultimateAutoWinToggle').checked = false;
+            hpS.disabled = strS.disabled = luckS.disabled = false;
 
-            // 4. Mostrar el switch SOLO si habilidad 100% stats es true, si no, ocultarlo
-            if (h.hasUltimate === true) {
-                ultContainer.classList.remove('hidden');
-            } else {
-                ultContainer.classList.add('hidden');
-            }
+            // Mostrar/Ocultar contenedores de habilidad
+            document.getElementById('ultimateContainer').classList.toggle('hidden', !h.hasUltimate);
+            document.getElementById('ultimateContainerAutoWin').classList.toggle('hidden', !h.hasAutoWin);
 
-            // 5. Mostrar el switch SOLO si habilidad autoWin es true, si no, ocultarlo
+            // Ajustar mínimos y valores base de los sliders
+            hpS.min = h.hp; hpS.value = h.hp;
+            strS.min = h.str; strS.value = h.str;
+            luckS.min = h.luck; luckS.value = h.luck;
 
-            if (h.hasAutoWin === true) {
-                ultContainerAutoWin.classList.remove('hidden');
-            } else {
-                ultContainerAutoWin.classList.add('hidden');
-            }
+            // Actualizar etiquetas numéricas
+            document.getElementById('valHP').innerText = h.hp;
+            document.getElementById('valSTR').innerText = h.str;
+            document.getElementById('valLUCK').innerText = h.luck;
 
-            // 6. Cargar los valores base en los inputs
-            document.getElementById('inputHP').value = h.hp;
-            document.getElementById('inputSTR').value = h.str;
-            document.getElementById('inputLUCK').value = h.luck;
-
-            // 7. Lógica de imagen (Mantiene tu código original)
-            const imgContainer = document.getElementById('hamsterImgContainer');
+            // Imagen del hámster
             const imgElement = document.getElementById('hamsterImg');
-
-            if (h.img !== "") {
+            if (h.img) {
                 imgElement.src = h.img;
-                imgContainer.style.display = 'block';
-            } else {
-                imgContainer.style.display = 'none';
+                document.getElementById('hamsterImgContainer').style.display = 'block';
             }
 
-            // 8. Recalcular probabilidades
             calculate();
         }
 
-        function enforceLimits(input, type) {
+        // 3. CÁLCULO FINAL: Suma todo y saca el porcentaje
+        function calculate() {
             const h = hamsters[document.getElementById('hamsterSelect').value];
-            let val = parseInt(input.value) || 0;
 
-            if (val < h[type]) { input.value = h[type]; val = h[type]; }
-            if (val > 100) { input.value = 100; val = 100; }
+            // 1. Leemos el valor de los sliders (al ser sliders, el valor siempre es un número válido)
+            const hp = parseInt(document.getElementById('inputHP').value);
+            const str = parseInt(document.getElementById('inputSTR').value);
+            const luck = parseInt(document.getElementById('inputLUCK').value);
+            const diff = document.getElementById('diffSelect').value;
 
-            const hp = parseInt(document.getElementById('inputHP').value) || 0;
-            const str = parseInt(document.getElementById('inputSTR').value) || 0;
-            const luck = parseInt(document.getElementById('inputLUCK').value) || 0;
+            const totalSum = hp + str + luck;
 
-            const currentExtra = (hp - h.hp) + (str - h.str) + (luck - h.luck);
+            // 2. Calculamos los puntos extra reales
+            const extra = totalSum - (h.hp + h.str + h.luck);
 
-            if (currentExtra > 49) {
-                const over = currentExtra - 49;
-                input.value = val - over;
+            // 3. Actualizamos la etiqueta de texto (ej. 95 / 49)
+            document.getElementById('extraPointsLabel').innerText = `${extra} / 49`;
+
+            // 4. FIX VISUAL: Limitamos el ancho de la barra al 100% con Math.min
+            // Aunque el extra sea superior a 49, la barra no se saldrá de su contenedor[cite: 3]
+            const visualPercentage = Math.min((extra / 49) * 100, 100);
+            document.getElementById('pointsBar').style.width = `${visualPercentage}%`;
+
+            // 5. Ajustamos el color y brillo de la barra si alcanza el máximo
+            if (extra >= 49) {
+                document.getElementById('pointsBar').className = "bg-amber-500 h-full rounded-full transition-all shadow-[0_0_10px_#f59e0b]";
+            } else {
+                document.getElementById('pointsBar').className = "bg-sky-400 h-full rounded-full transition-all";
             }
 
+            // 6. Cálculos de probabilidad
+            const baseProb = getBaseProb(totalSum);
+            const influence = difficultyImpact[diff];
+
+            // Verificamos si la habilidad de "Siempre Gana" está activa
+            const isAutoWin = document.getElementById('ultimateAutoWinToggle').checked;
+
+            let finalDisplay;
+            if (isAutoWin) {
+                finalDisplay = 100.00;
+            } else {
+                // Probabilidad base + dificultad + bono del hámster, limitada entre 0 y 100
+                finalDisplay = Math.min(Math.max(baseProb + influence + h.bonus, 0), 100);
+            }
+
+            // 7. Renderizar resultados finales en la interfaz
+            document.getElementById('sumLabel').innerText = totalSum;
+            document.getElementById('baseLabel').innerText = baseProb.toFixed(2) + "%";
+            document.getElementById('diffLabel').innerText = (influence > 0 ? "+" : "") + influence + "%";
+            document.getElementById('diffLabel').className = influence >= 0 ? "text-green-400" : "text-red-400";
+            document.getElementById('bonusLabel').innerText = h.bonus + "%";
+            document.getElementById('finalResult').innerText = finalDisplay.toFixed(2) + "%";
+        }
+
+        // 4. HABILIDAD ULTIMATE: Setea todo al 100
+        function toggleUltimate() {
+            const isChecked = document.getElementById('ultimateToggle').checked;
+            const hpS = document.getElementById('inputHP');
+            const strS = document.getElementById('inputSTR');
+            const luckS = document.getElementById('inputLUCK');
+
+            if (isChecked) {
+                userStatsCache = { hp: hpS.value, str: strS.value, luck: luckS.value };
+                hpS.value = strS.value = luckS.value = 100;
+                hpS.disabled = strS.disabled = luckS.disabled = true;
+            } else {
+                hpS.value = userStatsCache.hp;
+                strS.value = userStatsCache.str;
+                luckS.value = userStatsCache.luck;
+                hpS.disabled = strS.disabled = luckS.disabled = false;
+            }
+
+            document.getElementById('valHP').innerText = hpS.value;
+            document.getElementById('valSTR').innerText = strS.value;
+            document.getElementById('valLUCK').innerText = luckS.value;
             calculate();
         }
+
 
         function selectHamster(index) {
             const select = document.getElementById('hamsterSelect');
@@ -386,58 +435,9 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function calculate() {
-            const h = hamsters[document.getElementById('hamsterSelect').value];
-            const hp = parseInt(document.getElementById('inputHP').value) || h.hp;
-            const str = parseInt(document.getElementById('inputSTR').value) || h.str;
-            const luck = parseInt(document.getElementById('inputLUCK').value) || h.luck;
-            const diff = document.getElementById('diffSelect').value;
 
-            const totalSum = hp + str + luck;
 
-            // 1. Calculamos los puntos extra reales
-            const extra = totalSum - (h.hp + h.str + h.luck);
 
-            // 2. Mostramos el número real (ej. 95 / 49)[cite: 7]
-            document.getElementById('extraPointsLabel').innerText = `${extra} / 49`;
-
-            // 3. Limitamos el ancho de la barra al 100% para que no se desborde[cite: 7]
-            const visualPercentage = Math.min((extra / 49) * 100, 100);
-            document.getElementById('pointsBar').style.width = `${visualPercentage}%`;
-
-            // 4. Ajustamos el color y estilo de la barra según los puntos[cite: 7]
-            if (extra >= 49) {
-                document.getElementById('pointsBar').className = "bg-amber-500 h-full rounded-full transition-all shadow-[0_0_10px_#f59e0b]";
-            } else {
-                document.getElementById('pointsBar').className = "bg-sky-400 h-full rounded-full transition-all";
-            }
-
-            // 5. Cálculos matemáticos de probabilidad base[cite: 7]
-            const baseProb = getBaseProb(totalSum);
-            const influence = difficultyImpact[diff];
-            const finalCalculated = baseProb + influence + h.bonus;
-
-            // 6. Lógica de AUTO WIN
-            // Verificamos si el checkbox de Auto Win existe y está marcado
-            const autoWinToggle = document.getElementById('ultimateAutoWinToggle');
-            const isAutoWinActive = autoWinToggle ? autoWinToggle.checked : false;
-
-            let finalDisplay;
-            if (isAutoWinActive) {
-                finalDisplay = 100.00; // Forzamos el éxito total
-            } else {
-                // Aplicamos límites normales de 0% a 100%[cite: 7]
-                finalDisplay = Math.min(Math.max(finalCalculated, 0), 100);
-            }
-
-            // 7. Actualización de la interfaz[cite: 7]
-            document.getElementById('sumLabel').innerText = totalSum;
-            document.getElementById('baseLabel').innerText = baseProb.toFixed(2) + "%";
-            document.getElementById('diffLabel').innerText = (influence > 0 ? "+" : "") + influence + "%";
-            document.getElementById('diffLabel').className = influence >= 0 ? "text-green-400" : "text-red-400";
-            document.getElementById('bonusLabel').innerText = h.bonus + "%";
-            document.getElementById('finalResult').innerText = finalDisplay.toFixed(2) + "%";
-        }
         function init() {
             hamsters.forEach((h, index) => {
                 const opt = document.createElement('option');
