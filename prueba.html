@@ -97,8 +97,8 @@
 <body class="p-4 md:p-8">
 
     <header class="max-w-6xl mx-auto text-center mb-10">
-        <h1 class="header-font text-3xl md:text-5xl font-bold text-sky-400 mb-2">HAMSTER CALCULATOR</h1>
-        <p class="text-slate-400">Reglas: Bloqueo de mínimos y máximo de +49 puntos totales</p>
+        <h1 class="header-font text-3xl md:text-5xl font-bold text-sky-400 mb-2">HAMSTER SURVIVAL CALCULATOR</h1>
+        <p class="text-slate-400">Rules: Minimums locked and maximum of +49 total points</p>
     </header>
 
     <section
@@ -127,7 +127,7 @@
                 </div>
 
                 <div>
-                    <label class="text-xs uppercase text-sky-400 font-bold mb-1 block">1. Elige Hámster:</label>
+                    <label class="text-xs uppercase text-sky-400 font-bold mb-1 block">1. Choose Hamster:</label>
                     <select id="hamsterSelect" onchange="loadHamsterStats()"></select>
                 </div>
                 <!-- Añadir esto justo antes de la Dificultad -->
@@ -136,7 +136,7 @@
                     <input type="checkbox" id="ultimateToggle" class="w-5 h-5 cursor-pointer"
                         onchange="toggleUltimate()">
                     <label for="ultimateToggle"
-                        class="text-sm font-bold text-amber-500 uppercase cursor-pointer">Habilidad Ultimate (100%
+                        class="text-sm font-bold text-amber-500 uppercase cursor-pointer">Ultimate Ability (100%
                         Stats)</label>
                 </div>
                 <div id="ultimateContainerAutoWin"
@@ -145,29 +145,28 @@
                     <input type="checkbox" id="ultimateAutoWinToggle" class="w-5 h-5 cursor-pointer"
                         onchange="toggleAutoWin()">
                     <label for="ultimateAutoWinToggle"
-                        class="text-sm font-bold text-amber-500 uppercase cursor-pointer">Habilidad Ultimate (Siempre
-                        gana)</label>
+                        class="text-sm font-bold text-amber-500 uppercase cursor-pointer">Ultimate Ability (100% Win Rate)</label>
                 </div>
                 <div>
-                    <label class="text-xs uppercase text-sky-400 font-bold mb-1 block">2. Dificultad Expedición:</label>
+                    <label class="text-xs uppercase text-sky-400 font-bold mb-1 block">2. Mission Difficulty:</label>
                     <select id="diffSelect" onchange="calculate()">
-                        <option value="1">Nivel 1 (+5.00%)</option>
-                        <option value="2">Nivel 2 (+3.89%)</option>
-                        <option value="3">Nivel 3 (+2.78%)</option>
-                        <option value="4">Nivel 4 (+1.67%)</option>
-                        <option value="5">Nivel 5 (+0.56%)</option>
-                        <option value="6">Nivel 6 (-0.56%)</option>
-                        <option value="7">Nivel 7 (-1.67%)</option>
-                        <option value="8">Nivel 8 (-2.78%)</option>
-                        <option value="9">Nivel 9 (-3.89%)</option>
-                        <option value="10">Nivel 10 (-5.00%)</option>
+                        <option value="1">Level 1 (+5.00%)</option>
+                        <option value="2">Level 2 (+3.89%)</option>
+                        <option value="3">Level 3 (+2.78%)</option>
+                        <option value="4">Level 4 (+1.67%)</option>
+                        <option value="5">Level 5 (+0.56%)</option>
+                        <option value="6">Level 6 (-0.56%)</option>
+                        <option value="7">Level 7 (-1.67%)</option>
+                        <option value="8">Level 8 (-2.78%)</option>
+                        <option value="9">Level 9 (-3.89%)</option>
+                        <option value="10">Level 10 (-5.00%)</option>
                     </select>
                 </div>
             </div>
 
             <!-- ESTA ES LA COLUMNA CENTRAL: REEMPLÁZALA COMPLETA -->
             <div class="lg:col-span-4 bg-slate-900/50 p-4 rounded-lg border border-slate-700">
-                <h4 class="text-xs font-bold text-slate-400 uppercase mb-4 text-center">3. Ajustar Atributos (Máx +49
+                <h4 class="text-xs font-bold text-slate-400 uppercase mb-4 text-center">3. Stat Adjustment (Máx +49
                     pts)</h4>
                 <div class="space-y-4">
                     <div>
@@ -199,7 +198,7 @@
                 <!-- Info de puntos extra (Necesario para que calculate() funcione) -->
                 <div class="limit-info mt-4">
                     <div class="flex justify-between text-[10px] mb-1">
-                        <span class="text-slate-400 uppercase font-bold">Puntos Extra</span>
+                        <span class="text-slate-400 uppercase font-bold">Extra Points</span>
                         <span id="extraPointsLabel" class="text-sky-400 font-bold">0 / 49</span>
                     </div>
                     <div class="w-full bg-slate-800 rounded-full h-1.5">
@@ -211,12 +210,12 @@
 
             <div
                 class="lg:col-span-4 flex flex-col items-center justify-center bg-sky-500/10 rounded-lg border border-sky-500/30 p-6">
-                <span class="text-xs uppercase text-sky-300 font-bold mb-1">Supervivencia Final</span>
+                <span class="text-xs uppercase text-sky-300 font-bold mb-1">Survival Rate</span>
                 <span id="finalResult" class="text-6xl font-bold text-white">0%</span>
                 <div class="mt-4 text-xs text-slate-400 text-center">
-                    Suma total: <span id="sumLabel" class="text-white font-bold">0</span><br>
-                    Base: <span id="baseLabel" class="text-sky-400">0%</span> | Mod: <span id="diffLabel">0%</span><br>
-                    Bono Hámster: <span id="bonusLabel" class="text-emerald-400 font-bold">0%</span>
+                    Total Stats: <span id="sumLabel" class="text-white font-bold">0</span><br>
+                    Base Chance: <span id="baseLabel" class="text-sky-400">0%</span> | Mod: <span id="diffLabel">0%</span><br>
+                    Survival Passive: <span id="bonusLabel" class="text-emerald-400 font-bold">0%</span>
                 </div>
             </div>
         </div>
